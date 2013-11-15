@@ -1,3 +1,4 @@
+
 /* Detect-zoom
  * -----------
  * Cross Browser Zoom and Pixel Ratio Detector
@@ -8,13 +9,13 @@
  */
 
 //AMD and CommonJS initialization copied from https://github.com/zohararad/audio5js
-(function (root, ns, factory) {
+(function(root, ns, factory) {
     "use strict";
 
-    if (typeof (module) !== 'undefined' && module.exports) { // CommonJS
+    if (typeof(module) !== 'undefined' && module.exports) { // CommonJS
         module.exports = factory(ns, root);
-    } else if (typeof (define) === 'function' && define.amd) { // AMD
-        define(function () {
+    } else if (typeof(define) === 'function' && define.amd) { // AMD
+        define(function() {
             return factory(ns, root);
         });
     } else {
@@ -28,8 +29,40 @@
      * @return {Number}
      * @private
      */
-    var devicePixelRatio = function () {
+    var devicePixelRatio = function() {
         return window.devicePixelRatio || 1;
+    };
+
+    var zoomText = function () {
+        // 隐藏DIV的CSS
+        var hideCSS = 'position:absolute;left:-2000px;height:1px;',
+        // 以px为宽度单位的元素
+        pxBlock = document.createElement('div'),
+        // 以em为字宽度单位的元素
+        emBlockWrapper = document.createElement('div'),
+        emBlock = document.createElement('div'),
+        // 固定和变化的div宽度
+        pxBlockWidth,
+        emBlockWidth,
+        // 缩放
+        z;
+
+        pxBlock.style.cssText = 'width:16px;' + hideCSS;
+        document.body.appendChild(pxBlock);
+
+        emBlockWrapper.style.fontSize = 'medium';
+        emBlock.style.cssText = 'width:1em;' + hideCSS;
+        emBlockWrapper.appendChild(emBlock);
+        document.body.appendChild(emBlockWrapper);
+
+        pxBlockWidth = pxBlock.offsetWidth;
+        emBlockWidth = emBlock.offsetWidth;
+        z = emBlockWidth / pxBlockWidth;
+
+        document.body.removeChild(pxBlock);
+        document.body.removeChild(emBlockWrapper);
+
+        return z;
     };
 
     /**
@@ -37,7 +70,7 @@
      * @return {Object}
      * @private
      */
-    var fallback = function () {
+    var fallback = function() {
         return {
             zoom: 1,
             devicePxPerCssPx: 1
@@ -49,8 +82,21 @@
      * @return {Object}
      * @private
      **/
-    var ie8 = function () {
+    var ie8 = function() {
         var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100) / 100;
+        return {
+            zoom: zoom,
+            devicePxPerCssPx: zoom * devicePixelRatio()
+        };
+    };
+
+    // the trick: body's offsetWidth was in CSS pixels, while
+    // getBoundingClientRect() was in system pixels in IE7.
+    // Thanks to http://help.dottoro.com/ljgshbne.php
+    var ie7 = function () {
+        var rect = document.body.getBoundingClientRect(),
+        zoom = (rect.right - rect.left) / document.body.offsetWidth;        
+        zoom = Math.round(zoom * 100) / 100;
         return {
             zoom: zoom,
             devicePxPerCssPx: zoom * devicePixelRatio()
@@ -66,8 +112,8 @@
      * @private
      */
     var webkitMobile = function () {
-        var deviceWidth = (Math.abs(window.orientation) == 90) ? screen.height : screen.width;
-        var zoom = deviceWidth / window.innerWidth;
+        var deviceWidth = (Math.abs(window.orientation) === 90) ? screen.height : screen.width,
+        zoom = deviceWidth / window.innerWidth;
         return {
             zoom: zoom,
             devicePxPerCssPx: zoom * devicePixelRatio()
@@ -91,29 +137,16 @@
      * @private
      */
     var webkit = function () {
-        var important = function (str) {
-            return str.replace(/;/g, " !important;");
-        };
-
-        var div = document.createElement('div');
-        div.innerHTML = "1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0";
-        div.setAttribute('style', important('font: 100px/1em sans-serif; -webkit-text-size-adjust: none; height: auto; width: 1em; padding: 0; overflow: visible;'));
-
-        // The container exists so that the div will be laid out in its own flow
-        // while not impacting the layout, viewport size, or display of the
-        // webpage as a whole.
-        // Add !important and relevant CSS rule resets
-        // so that other rules cannot affect the results.
-        var container = document.createElement('div');
-        container.setAttribute('style', important('width:0; height:0; overflow:hidden; visibility:hidden; position: absolute;'));
-        container.appendChild(div);
-
-        document.body.appendChild(container);
-        var zoom = 1000 / div.clientHeight;
+        var zoom = window.outerWidth / window.innerWidth;
         zoom = Math.round(zoom * 100) / 100;
-        document.body.removeChild(container);
 
-        return{
+        // 360安全浏览器下的innerWidth包含了侧边栏的宽度
+        /* if (zoom !== 100) {
+            if (zoom >= 95 && zoom <= 105) {
+                zoom = 100;
+            }
+        } */
+        return {
             zoom: zoom,
             devicePxPerCssPx: zoom * devicePixelRatio()
         };
@@ -181,7 +214,7 @@
      * @param epsilon
      * @return {Number}
      */
-    var mediaQueryBinarySearch = function (property, unit, a, b, maxIter, epsilon) {
+    var mediaQueryBinarySearch = function(property, unit, a, b, maxIter, epsilon) {
         var matchMedia;
         var head, style, div;
         if (window.matchMedia) {
@@ -196,11 +229,13 @@
             div.style.display = 'none';
             document.body.appendChild(div);
 
-            matchMedia = function (query) {
+            matchMedia = function(query) {
                 style.sheet.insertRule('@media ' + query + '{.mediaQueryBinarySearch ' + '{text-decoration: underline} }', 0);
                 var matched = getComputedStyle(div, null).textDecoration == 'underline';
                 style.sheet.deleteRule(0);
-                return {matches: matched};
+                return {
+                    matches: matched
+                };
             };
         }
         var ratio = binarySearch(a, b, maxIter);
@@ -229,26 +264,31 @@
      * @private
      */
     var detectFunction = (function () {
-        var func = fallback;
+        var func = fallback,
+        ua = navigator.userAgent.toLowerCase();
         //IE8+
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+        if (!isNaN(screen.deviceXDPI) && !isNaN(screen.logicalXDPI)) {
             func = ie8;
+        }
+        // IE7
+        else if (-1 !== ua.indexOf("msie 7.")) {
+            func = ie7;
         }
         //Mobile Webkit
         else if ('ontouchstart' in window && typeof document.body.style.webkitTextSizeAdjust === 'string') {
             func = webkitMobile;
         }
-        //WebKit
-        else if (typeof document.body.style.webkitTextSizeAdjust === 'string') {
+        // WebKit
+        else if (-1 !== ua.indexOf("webkit")) {
             func = webkit;
         }
         //Opera
-        else if (navigator.userAgent.indexOf('Opera') >= 0) {
+        else if (-1 !== ua.indexOf('opera')) {
             func = opera11;
         }
         //Last one is Firefox
         //FF 18.x
-        else if (window.devicePixelRatio) {
+        else if (-1 !== ua.indexOf('firefox') && window.devicePixelRatio) {
             func = firefox18;
         }
         //FF 4.0 - 17.x
@@ -276,6 +316,10 @@
          */
         device: function () {
             return detectFunction().devicePxPerCssPx;
+        },
+
+        zoomText: function () {
+            return zoomText();
         }
     });
 }));
