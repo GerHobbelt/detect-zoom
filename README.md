@@ -64,13 +64,10 @@ implementation of window.devicePixel starting Firefox 18
 * _Open Issue: Firefox returns `zoom` and `devicePixelRatio` the same. Still looking for a solution here._
 * Started versioning - this is version 1.0.0
 
-Help Needed
+Bug
 ------
 
-***Detect-zoom is not complete, many parts of the code are 6 to 12 months old and I'm still reviewing them  
-I need help testing different browsers, finding betrer ways to measure zoom on problematic browsers (ahm.. Firefox.. ahm)  
-patches are more than welcome.***
-
+在 Retina 屏幕的 FireFox 浏览器会出现问题。
 
 License
 ------
