@@ -9,7 +9,7 @@
  */
 
 //AMD and CommonJS initialization copied from https://github.com/zohararad/audio5js
-(function(root, ns, factory) {
+(function (root, ns, factory) {
     "use strict";
 
     if (typeof(module) !== 'undefined' && module.exports) { // CommonJS
@@ -29,10 +29,11 @@
      * @return {Number}
      * @private
      */
-    var devicePixelRatio = function() {
+    var devicePixelRatio = function () {
         return window.devicePixelRatio || 1;
     };
 
+    // 增加检测字体缩放功能
     var zoomText = function () {
         // 隐藏DIV的CSS
         var hideCSS = 'position:absolute;left:-2000px;height:1px;',
@@ -70,7 +71,7 @@
      * @return {Object}
      * @private
      */
-    var fallback = function() {
+    var fallback = function () {
         return {
             zoom: 1,
             devicePxPerCssPx: 1
@@ -82,7 +83,7 @@
      * @return {Object}
      * @private
      **/
-    var ie8 = function() {
+    var ie8 = function () {
         var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100) / 100;
         return {
             zoom: zoom,
@@ -90,9 +91,11 @@
         };
     };
 
-    // the trick: body's offsetWidth was in CSS pixels, while
-    // getBoundingClientRect() was in system pixels in IE7.
-    // Thanks to http://help.dottoro.com/ljgshbne.php
+    /* 添加 IE7 支持
+     * the trick: body's offsetWidth was in CSS pixels, while
+     * getBoundingClientRect() was in system pixels in IE7.
+     * Thanks to http://help.dottoro.com/ljgshbne.php
+     */
     var ie7 = function () {
         var rect = document.body.getBoundingClientRect(),
         zoom = (rect.right - rect.left) / document.body.offsetWidth;        
@@ -120,22 +123,7 @@
         };
     };
 
-    /**
-     * Desktop Webkit
-     * the trick: an element's clientHeight is in CSS pixels, while you can
-     * set its line-height in system pixels using font-size and
-     * -webkit-text-size-adjust:none.
-     * device-pixel-ratio: http://www.webkit.org/blog/55/high-dpi-web-sites/
-     *
-     * Previous trick (used before http://trac.webkit.org/changeset/100847):
-     * documentElement.scrollWidth is in CSS pixels, while
-     * document.width was in system pixels. Note that this is the
-     * layout width of the document, which is slightly different from viewport
-     * because document width does not include scrollbars and might be wider
-     * due to big elements.
-     * @return {Object}
-     * @private
-     */
+    // 修复 Webkit 在 Chrome 27+ 上面不支持 -webkit-text-size-adjust 属性
     var webkit = function () {
         var zoom = window.outerWidth / window.innerWidth;
         zoom = Math.round(zoom * 100) / 100;
@@ -214,7 +202,7 @@
      * @param epsilon
      * @return {Number}
      */
-    var mediaQueryBinarySearch = function(property, unit, a, b, maxIter, epsilon) {
+    var mediaQueryBinarySearch = function (property, unit, a, b, maxIter, epsilon) {
         var matchMedia;
         var head, style, div;
         if (window.matchMedia) {

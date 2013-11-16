@@ -1,48 +1,34 @@
-Cross Browser Zoom and Pixel Ratio Detector
+跨浏览器实现检测浏览器缩放
 ======
 ------
 
-**As of January 2013 https://github.com/yonran stopped maintaining his source, and trasfered the repository to me**  
-**If you are looking to update previous versions note that there were some breaking chnages**
+**基于 https://github.com/yonran/detect-zoom 修改**
+
+主要修改一下几点。
+1. 增加对 IE7 的支持
+2. 增加支持检测字体缩放的
+3. 修改 Webkit 在 Chrome 27+ 上面失效的问题
+4. 增加 Demo 演示
 
 
-* **Major Changes form the latest yonran version:**
-    * `DetectZoom` object name changed to `detectZoom`
-    * `DetectZoom.ratio()` is no longer publicly accesible    
-    * Supported browsres: IE8+, FF4+, modern Webkit, mobile Webkit, Opera 11.1+
-    * *IE6, IE7, FF 3.6 and Opera 10.x are no longer supported*
-    * Added support to be loaded as an AMD and CommonJS module
-
-What is this for?
+Demo
 ------
-Detecting the browser zoom level and device pixel ratio relative to the zoom level.
-
-It can be used to show higher-resolution `canvas` or `img` when necessary, 
-to warn users that your site's layout will be broken in their current zoom level, 
-and much more.    
-Personally I'm maitaining it to use Detect-zoom in [Wix.com](http://wix.com)'s editor to warn users 
-that their browser is in zoom mode before saving imporant changes to their wabsite.
-
-
-Live Example 
-------
-See the Live Example section in  
-http://tombigel.github.com/detect-zoom/
+http://alphatr.github.io/detect-zoom/
 
 Usage
 ------
-**Detect-zoom has only two public functions:**  
-* `zoom()`   Returns the zoom level of the user's browser using Javascript.  
-* `device()`   Returns the device pixel ratio multiplied by the zoom level (Read [more about devicePixelRatio](http://www.quirksmode.org/blog/archives/2012/07/more_about_devi.html) at QuirksMode)
+**Detect-zoom 提供了三个方法:**  
+* `zoom()`   返回当前屏幕缩放比.  
+* `device()`   返回在当前屏幕缩放比下的设备像素比 (Read [more about devicePixelRatio](http://www.quirksmode.org/blog/archives/2012/07/more_about_devi.html) at QuirksMode)
+* 'zoomText()' 返回文字的缩放比
 
 ```html
-    <script src="detect-zoom.js"></script>
-    <script>
-      var zoom = detectZoom.zoom();
-      var device = detectZoom.device();
-
-      console.log(zoom, device);
-    </script>
+<script src="detect-zoom.js"></script>
+<script>
+    var zoom = detectZoom.zoom();
+    var device = detectZoom.device();
+    console.log(zoom, device);
+</script>
 ```
 
 **AMD Usage**
@@ -55,6 +41,11 @@ Usage
 
 Changelog
 ------
+2013/11/16
+* 增加对 IE7 的支持
+* 增加支持检测字体缩放的
+* 修改 Webkit 在 Chrome 27+ 上面失效的问题
+* 增加 Demo 演示
 
 2013/1/26 
 * Repository moved here
