@@ -1,18 +1,245 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>detect-zoom Demo page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="detect-zoom.js" type="text/javascript"></script>
     <script type="text/javascript">
-        $(function () {
+        function showZoom() {
             $('.zoom').html(window.detectZoom.zoom());
             $('.device').html(window.detectZoom.device());
-        });
+        }
+
+        $(window).on('resize.detectZoom', showZoom);
+        $(window).on('load.detectZoom', showZoom);
     </script>
+    <style>
+    body {
+        font-family: Verdana, Geneva, Helvetica, sans-serif;
+
+        background-color: #eee;
+    }
+    dd {
+        background-color: white;
+        padding: 0.3em;
+        margin-bottom: 1em;
+        width: 10em;
+    }
+    </style>
 </head>
 <body>
-    <div class="zoom"></div>
-    <div class="device"></div>
+  <div style="float: left; width: 18em; border: 0.5em solid #fdd; padding: 0.5em; margin-left: 1em;">
+    <h1>Detect Zoom</h1>
+    <dl>
+        <dt>Zoom level:</dt> <dd class="zoom"></dd>
+        <dt>Device Pixel Ratio:</dt> <dd class="device"></dd>
+    </dl>
+
+
+    <div style="padding-top: 3em; padding-bottom: 1em; border-top: 0.2em solid #ccc; margin: 4em 1em 2em;">
+        <div><label><input type="checkbox" onChange="$('#verticalStrut').toggle(this.checked);  resizeHandler(); showZoom();">Force vertical scrollbars</label></div>
+        <div><label><input type="checkbox" onChange="$('#horizontalStrut').toggle(this.checked);  resizeHandler(); showZoom();">Force horizontal scrollbars</label></div>
+        <div><label><input type="checkbox" onChange="document.body.style.margin = this.checked ? 0 : '';  resizeHandler(); showZoom();">body {margin:0}</label></div>
+        <div><label><input type="checkbox" onChange="window.shouldRound = this.checked ? true : false;  resizeHandler(); showZoom();" checked="">Round to nearest 1/100</label></div>
+    </div>
+  </div>
+
+
+  <div style="float: left; width: 45em; border: 0.5em solid #dfd; padding: 0.5em; margin-left: 1em;">
+    <h1>Further dimensions' values for testing</h1>
+    <p>(This code originates from: <a href="http://htmldoodads.appspot.com/dimensions.html">http://htmldoodads.appspot.com/dimensions.html</a>)</p>
+
+    <style>
+    td, th {
+        padding: 0.3em;
+    }
+
+    th {
+        background-color: black;
+        color: white;
+        font-style: bold;
+    }
+
+    tr:nth-child(1) {
+      background-color: #ddd;
+    }
+
+    td:nth-child(1) {
+      background-color: white;
+    }
+
+    td:nth-child(2) {
+      white-space: pre-wrap
+    }
+
+    .collapsed {
+        display: none;
+    }
+    </style>
+
+    <table id="units">
+      <tbody>
+        <tr>
+          <th colspan="3">“Layout viewport” width: how big is a width:100% element?</th>
+        </tr>
+        <tr>
+          <td>2860</td><td>jQuery(window).width()</td>
+        </tr>
+        <tr>
+          <td>2860</td><td>document.documentElement.clientWidth</td>
+        </tr>
+        <tr>
+          <td>2845</td><td>document.body.clientWidth</td>
+        </tr>
+        <tr>
+          <td>2844</td><td>document.getElementById("staticDiv").clientWidth</td>
+        </tr>
+        <tr>
+          <td>2844</td><td>document.getElementById("static100Div").clientWidth</td>
+        </tr>
+        <tr>
+          <td>2860</td><td>document.getElementById("fixedDiv").clientWidth</td>
+        </tr>
+        <tr>
+          <th colspan="3">“Visual viewport” width</th>
+        </tr>
+        <tr>
+          <td>2882</td><td>window.innerWidth  // typically includes scrollbars</td>
+        </tr>
+        <tr>
+          <td>1920</td><td>window.outerWidth  // includes scrollbars. In Chrome, also includes OS chrome</td>
+        </tr>
+        <tr>
+          <td>2882</td><td>window.innerHeight  // excludes dev panel</td>
+        </tr>
+        <tr>
+          <td>1920</td><td>window.outerHeight  // may include dev panel</td>
+        </tr>
+        <tr>
+          <th colspan="3">Document width: scrolling width of document</th>
+        </tr>
+        <tr>
+          <td>2860</td><td>jQuery(document).width()</td>
+        </tr>
+        <tr>
+          <td></td><td>document.width</td>
+        </tr>
+        <tr>
+          <th colspan="3">other</th>
+        </tr>
+        <tr>
+          <td>22.5</td><td>// <a href="" onclick="$(this).next().toggle(); return false;">scrollbar width for overflow:scroll divs</a>
+            <div class="collapsed">
+                var outerDiv = document.createElement('div');
+                outerDiv.style.width = outerDiv.style.height = '500px';  // enough for all the scrollbars
+                var div = outerDiv;
+                for (var i = 0; i &lt; 10; ++i) {
+                  var child = document.createElement('div');
+                  child.style.overflowY = 'scroll';
+                  div.appendChild(child);
+                  div = child;
+                }
+                document.body.appendChild(outerDiv);
+                var outerDivWidth = outerDiv.clientWidth;
+                var innerDivWidth = div.clientWidth;
+                var scrollbarWidthCss = (outerDivWidth - innerDivWidth)/10;
+                document.body.removeChild(outerDiv);
+                return scrollbarWidthCss;
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>0.67</td><td>window.devicePixelRatio</td>
+        </tr>
+        <tr>
+          <td></td><td>screen.deviceXDPI</td>
+        </tr>
+        <tr>
+          <td></td><td>screen.systemXDPI</td>
+        </tr>
+        <tr>
+          <td></td><td>screen.logicalXDPI</td>
+        </tr>
+        <tr>
+          <td></td><td>aspectRatioForChrome()</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr style="clear: both;">
+
+    <div id="verticalStrut" style="position: absolute; top: 0px; left: 0px; height: 150%; width: 1px; visibility: hidden;"></div>
+    <div id="horizontalStrut" style="position: absolute; top: 0px; left: 0px; width: 150%; height: 1px; visibility: hidden;"></div>
+    <div id="staticDiv" style="background:lightgreen;height:2em;text-align:right;margin:0;padding:0;border:0;">staticDiv: just a div</div>
+    <div id="static100Div" style="background:lightgray;width:100%;height:2em;text-align:right;margin:0;padding:0;border:0">static100Div: div with width:100%</div>
+    <div id="fixedDiv" style="position:fixed;left:0;bottom:1em;background:gold;height:2em;width:100%;text-align:right;margin:0;padding:0;border:0;z-index:-1">fixedDiv: div with position:fixed;width:100%</div>
+
+    <script>
+    window.shouldRound = true;
+
+    function resizeHandler() {
+      var list = [];
+      $("#units tr").each(function() {
+        var expr = $(this).find("td:nth-child(2)").text();
+        if (! /\S/.test(expr)) return;
+        if (/screen\./.test(expr)) {
+          expr = "if (typeof screen !== 'undefined') {\n  return " + expr + ";\n} else {\n  return '???';\n}";
+        } else if (-1 === expr.indexOf(";")) {
+          expr = "return " + expr + ";";
+        }
+        var value;
+        try {
+            value = new Function(expr)();
+            if (typeof value === 'undefined') {
+                value = '???';
+            }
+        } catch (e) {
+            value = '???';
+        }
+        if (window.shouldRound && "number" === typeof value) {
+          value = Math.round(value * 100) / 100;
+        }
+        list.push({
+          cell: $(this).find("td:nth-child(1)"), 
+          value: value
+        });
+      });
+      $.each(list, function() {
+        this.cell.text(this.value);
+      });
+    }
+
+    // Based on answer from @jeum at http://stackoverflow.com/questions/1713771/how-to-detect-page-zoom-level-in-all-modern-browsers/5078596#5078596
+    function aspectRatioForChrome() {
+        var snap = function (r, snaps, ratios) {
+            var i;
+            for (i = 0; i < 16; i++) { 
+                if (r < snaps[i]) {
+                    return ratios[i]; 
+                }
+            }
+        };
+        var w = window.outerWidth;
+        var l = window.innerWidth;
+        var r1 = (w - 16) / l;
+        
+        var o = window.outerHeight;
+        var i = window.innerHeight;
+        var r2 = (o - 16) / i;
+        // does not matter where the dev panel is: bottom or side. We pick the best ratio anyway.
+        var r = Math.min(r1, r2);
+        return snap(r,
+                    [ 0.29, 0.42, 0.58, 0.71, 0.83, 0.95, 1.05, 1.18, 1.38, 1.63, 1.88, 2.25, 2.75, 3.5, 4.5, 100 ],
+                    [ 0.25, 1/3, 0.5, 2/3, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5 ]
+        );
+    }
+
+    $(window).on('resize.extraData', resizeHandler);
+    resizeHandler();
+    </script>
 </body>
 </html>
