@@ -145,24 +145,38 @@
 
     /**
      * Desktop Webkit
-     * Create SVG, detect current scale ratio, remove SVG.
-     * devicePixelRatio is affected by the zoom level,
-     * so we can't tell, if we are in zoom mode or in a device
-     * with a different pixel ratio
+     * While the SVG.currentScale trick turned out to be a total failure when you run on touchscreen-enabled hardware,
+     * e.g. a modern Windows 8.1/64+Chrome laptop, as it would only register the zoom level induced by Ctrl+/-/0 while
+     * utterly neglecting zoom-by-pinch (touch), it turns out that this little monster actually got it right all the time.
      * @return {Object}
      * @private
      */
     var webkit = function () {
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        svg.setAttribute('version', '1.1');
-        if (document.body == null) {
-            console.log('**ERROR**: cannot run zoom-detect until after the page has loaded (and the DOM has initialized');
-            return fallback();
-        }
-        document.body.appendChild(svg);
-        var zoom = Math.round(svg.currentScale * 100) / 100;
-        document.body.removeChild(svg);
+        // Based on answer from @jeum at http://stackoverflow.com/questions/1713771/how-to-detect-page-zoom-level-in-all-modern-browsers/5078596#5078596
+        //
+        // We are 'clever' enough to counter the 'developer panel' argument against this one by measuring both horizontal and vertical zoom nd
+        // picking the very best fit.
+        var snap = function (r, snaps, ratios) {
+            var i;
+            for (i = 0; i < 16; i++) { 
+                if (r < snaps[i]) {
+                    return ratios[i]; 
+                }
+            }
+        };
+        var w = window.outerWidth;
+        var l = window.innerWidth;
+        var r1 = (w - 16) / l;
+        
+        var o = window.outerHeight;
+        var i = window.innerHeight;
+        var r2 = (o - 16) / i;
+        // does not matter where the dev panel is: bottom or side. We pick the best ratio anyway.
+        var r = Math.min(r1, r2);
+        var zoom = snap(r,
+                    [ 0.29, 0.42, 0.58, 0.71, 0.83, 0.95, 1.05, 1.18, 1.38, 1.63, 1.88, 2.25, 2.75, 3.5, 4.5, 100 ],
+                    [ 0.25, 1/3, 0.5, 2/3, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5 ]
+        );
         return {
             zoom: zoom,
             devicePxPerCssPx: devicePixelRatio(),
