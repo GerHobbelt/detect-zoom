@@ -74,7 +74,8 @@
         return {
             zoom: 1,
             devicePxPerCssPx: 1,
-	    fallback: true
+            fallback: true,
+            name: 'fallback'
         };
     };
 
@@ -87,7 +88,8 @@
         var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: zoom * devicePixelRatio()
+            devicePxPerCssPx: zoom * devicePixelRatio(),
+            name: 'IE8/9'
         };
     };
 
@@ -103,7 +105,8 @@
         zoom = Math.round(zoom * 100) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: zoom * devicePixelRatio()
+            devicePxPerCssPx: zoom * devicePixelRatio(),
+            name: 'IE7'
         };
     };
 
@@ -117,7 +120,8 @@
         var zoom = Math.round((document.documentElement.offsetHeight / window.innerHeight) * 100) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: zoom * devicePixelRatio()
+            devicePxPerCssPx: zoom * devicePixelRatio(),
+            name: 'IE10+'
         };
     };
 
@@ -134,7 +138,8 @@
         var zoom = Math.round(100 * screenWidth / viewportWidth) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: devicePixelRatio()
+            devicePxPerCssPx: devicePixelRatio(),
+            name: 'Webkit Mobile'
         };
     };
 
@@ -151,12 +156,17 @@
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         svg.setAttribute('version', '1.1');
+        if (document.body == null) {
+            console.log('**ERROR**: cannot run zoom-detect until after the page has loaded (and the DOM has initialized');
+            return fallback();
+        }
         document.body.appendChild(svg);
         var zoom = Math.round(svg.currentScale * 100) / 100;
         document.body.removeChild(svg);
-        return{
+        return {
             zoom: zoom,
-            devicePxPerCssPx: devicePixelRatio()
+            devicePxPerCssPx: devicePixelRatio(),
+            name: 'Webkit Desktop'
         };
     };
 
@@ -175,7 +185,8 @@
         zoom = Math.round(zoom * 100) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: zoom
+            devicePxPerCssPx: zoom,
+            name: 'FireFox 4-17'
         };
     };
 
@@ -191,7 +202,8 @@
     var firefox18 = function () {
         return {
             zoom: firefox4().zoom,
-            devicePxPerCssPx: devicePixelRatio()
+            devicePxPerCssPx: devicePixelRatio(),
+            name: 'FireFox 18+'
         };
     };
 
@@ -208,7 +220,8 @@
         zoom = Math.round(zoom * 100) / 100;
         return {
             zoom: zoom,
-            devicePxPerCssPx: zoom * devicePixelRatio()
+            devicePxPerCssPx: zoom * devicePixelRatio(),
+            name: 'Opera 11.11'
         };
     };
 
@@ -325,7 +338,7 @@
         // IE10+ / Touch
         else if (window.navigator.msMaxTouchPoints) {
             func = ie10;
-	}
+        }
         // Mobile Webkit
         else if ('orientation' in window && 'webkitRequestAnimationFrame' in window) {
             func = webkitMobile;

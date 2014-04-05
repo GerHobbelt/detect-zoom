@@ -9,8 +9,11 @@
     <script src="detect-zoom.js" type="text/javascript"></script>
     <script type="text/javascript">
         function showZoom() {
-            $('.zoom').html(window.detectZoom.zoom());
-            $('.device').html(window.detectZoom.device());
+            var info = window.detectZoom.detect();
+            $('.zoom').html(info.zoom);
+            $('.device').html(info.device);
+            $('.fallback').html(info.fallback ? "YES" : "no");
+            $('.browsername').html(info.name);
         }
 
         $(window).on('resize.detectZoom', showZoom);
@@ -36,6 +39,8 @@
     <dl>
         <dt>Zoom level:</dt> <dd class="zoom"></dd>
         <dt>Device Pixel Ratio:</dt> <dd class="device"></dd>
+        <dt>Fallback to 1:</dt> <dd class="fallback"></dd>
+        <dt>Detect Mode:</dt> <dd class="browsername"></dd>
     </dl>
 
 
