@@ -40,9 +40,11 @@
     var fallback = function () {
         return {
             zoom: 1,
-            devicePxPerCssPx: 1
+            devicePxPerCssPx: 1,
+	    fallback: true
         };
     };
+
     /**
      * IE 8 and 9: no trick needed!
      * TODO: Test on IE10 and Windows 8 RT
@@ -80,7 +82,7 @@
      * @private
      */
     var webkitMobile = function () {
-        var deviceWidth = (Math.abs(window.orientation) == 90) ? screen.height : screen.width;
+        var deviceWidth = (Math.abs(window.orientation) === 90) ? screen.height : screen.width;
         var zoom = deviceWidth / window.innerWidth;
         return {
             zoom: zoom,
@@ -223,6 +225,7 @@
      */
     var detectFunction = function () {
         var func = fallback;
+
         //IE8+
         if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
             func = ie8;
@@ -277,7 +280,18 @@
     }());
 
 
-    return ({
+    return {
+        /**
+         * initial state
+         * @return {Object}
+         */
+        initial: detect(),
+	
+        /**
+         * detect
+         * @return {Object}
+         */
+        detect: detect,
 
         /**
          * Ratios.zoom shorthand
@@ -294,5 +308,5 @@
         device: function () {
             return detect().devicePxPerCssPx;
         }
-    });
+    };
 }));
