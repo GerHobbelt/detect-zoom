@@ -1,6 +1,5 @@
 Cross Browser Zoom and Pixel Ratio Detector
 ======
-------
 
 ### READ THIS: Detect-zoom is currently unusable for desktop
 
@@ -83,6 +82,9 @@ require(['detect-zoom'], function(detectZoom){
 
 Changelog
 ------
+
+2014/4/05
+* Mobile Webkit zoom detection now works (will detect ratios for pinch-zoom) (work done by Andrew Hassan)
 
 2013/4/01
 * Changed WebKit detection from deprecated webkitTextSizeAdjust to webkitMarquee
