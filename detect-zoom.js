@@ -32,6 +32,39 @@
         return Math.round(window.devicePixelRatio * 100) / 100 || 1;
     };
 
+    // Detect the font (text) zoom ratio, i.e. how many `px` go into an `em`? 
+    var zoomText = function () {
+        // Hidden DIV's CSS:
+        var hideCSS = 'position:absolute;left:-2000px;height:1px;',
+        // With the width in unit px
+        pxBlock = document.createElement('div'),
+        // While the text itself is measured in ems
+        emBlockWrapper = document.createElement('div'),
+        emBlock = document.createElement('div'),
+        // Fixed and variable width DIV
+        pxBlockWidth,
+        emBlockWidth,
+        // zoom
+        z;
+
+        pxBlock.style.cssText = 'width:16px;' + hideCSS;
+        document.body.appendChild(pxBlock);
+
+        emBlockWrapper.style.fontSize = 'medium';
+        emBlock.style.cssText = 'width:1em;' + hideCSS;
+        emBlockWrapper.appendChild(emBlock);
+        document.body.appendChild(emBlockWrapper);
+
+        pxBlockWidth = pxBlock.offsetWidth;
+        emBlockWidth = emBlock.offsetWidth;
+        z = emBlockWidth / pxBlockWidth;
+
+        document.body.removeChild(pxBlock);
+        document.body.removeChild(emBlockWrapper);
+
+        return z;
+    };
+
     /**
      * Fallback function to set default values
      * @return {Object}
@@ -47,12 +80,27 @@
 
     /**
      * IE 8 and 9: no trick needed!
-     * TODO: Test on IE10 and Windows 8 RT
      * @return {Object}
      * @private
      **/
     var ie8 = function () {
         var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100) / 100;
+        return {
+            zoom: zoom,
+            devicePxPerCssPx: zoom * devicePixelRatio()
+        };
+    };
+
+    /**
+     * IE7:
+     * the trick: body's offsetWidth was in CSS pixels, while
+     * getBoundingClientRect() was in system pixels in IE7.
+     * Thanks to http://help.dottoro.com/ljgshbne.php
+     */
+    var ie7 = function () {
+        var rect = document.body.getBoundingClientRect(),
+        zoom = (rect.right - rect.left) / document.body.offsetWidth;        
+        zoom = Math.round(zoom * 100) / 100;
         return {
             zoom: zoom,
             devicePxPerCssPx: zoom * devicePixelRatio()
@@ -196,7 +244,9 @@
                 style.sheet.insertRule('@media ' + query + '{.mediaQueryBinarySearch ' + '{text-decoration: underline} }', 0);
                 var matched = getComputedStyle(div, null).textDecoration == 'underline';
                 style.sheet.deleteRule(0);
-                return {matches: matched};
+                return {
+                    matches: matched
+                };
             };
         }
 
@@ -262,33 +312,38 @@
      */
     var detectFunction = function () {
         var func = fallback;
+        var ua = navigator.userAgent.toLowerCase();
 
         //IE8+
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+        if (!isNaN(screen.deviceXDPI) && !isNaN(screen.logicalXDPI)) {
             func = ie8;
+        }
+        // IE7
+        else if (-1 !== ua.indexOf("msie 7.")) {
+            func = ie7;
         }
         // IE10+ / Touch
         else if (window.navigator.msMaxTouchPoints) {
             func = ie10;
-        }
-        //Mobile Webkit
+	}
+        // Mobile Webkit
         else if ('orientation' in window && 'webkitRequestAnimationFrame' in window) {
             func = webkitMobile;
         }
-        //WebKit
+        // WebKit
         else if ('webkitRequestAnimationFrame' in window) {
             func = webkit;
         }
-        //Opera
-        else if (navigator.userAgent.indexOf('Opera') >= 0) {
+        // Opera
+        else if (-1 !== ua.indexOf('opera')) {
             func = opera11;
         }
-        //Last one is Firefox
-        //FF 18.x
-        else if (window.devicePixelRatio) {
+        // Last one is Firefox
+        // FF 18.x
+        else if (-1 !== ua.indexOf('firefox') && window.devicePixelRatio) {
             func = firefox18;
         }
-        //FF 4.0 - 17.x
+        // FF 4.0 - 17.x
         else if (firefox4().zoom > 0.001) {
             func = firefox4;
         }
@@ -344,6 +399,10 @@
          */
         device: function () {
             return detect().devicePxPerCssPx;
+        },
+
+        zoomText: function () {
+            return zoomText();
         }
     };
 }));
