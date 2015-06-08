@@ -2,7 +2,14 @@
   "name": "detect-zoom",
   "version": "1.0.4",
   "main": "detect-zoom.js",
-  "ignore": [],
-  "dependencies": {},
-  "devDependencies": {}
+  "homepage": "https://github.com/eukleia/detect-zoom",
+  "description": "Cross Browser Zoom and Pixel Ratio Detector",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "zoom"
+  ],
+  "license": "MIT"
 }
