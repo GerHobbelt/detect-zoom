@@ -1,0 +1,8 @@
+{
+  "name": "detect-zoom",
+  "version": "1.0.4",
+  "main": "detect-zoom.js",
+  "ignore": [],
+  "dependencies": {},
+  "devDependencies": {}
+}
