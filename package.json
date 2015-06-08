@@ -26,6 +26,8 @@
   "readmeFilename": "README.md",
   "gitHead": "6eaf3107a6913a4f7b93665ba6d5bc16cdf0f3ab",
   "devDependencies": {
-    "uglify-js": "~2.2.5"
+    "gulp": "^3.9.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.2.0"
   }
 }
