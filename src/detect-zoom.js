@@ -266,7 +266,7 @@
       func = blink;
     }
     // Safari
-    else if (Object.prototype.hutoString.call(window.HTMLElement).indexOf('Constructor') > 0){
+    else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0){
       func = safari;
     }
     // WebKit
