@@ -85,9 +85,12 @@
    * @private
    */
   var blink = function() {
-    var zoom = Math.round(((window.outerWidth) / window.innerWidth) * 100) / 100;
+    var zoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100;
     zoom = zoom.toString();
-    zoom = zoom.slice(0, - 1);
+
+    if (zoom.length > 3) {
+      zoom = zoom.slice(0, -1);
+    }
     zoom = parseFloat(zoom);
 
     return {
@@ -102,9 +105,12 @@
    * @private
    */
   var safari= function() {
-    var zoom = Math.round(((window.outerWidth) / window.innerWidth) * 100) / 100;
+    var zoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100;
     zoom = zoom.toString();
-    zoom = zoom.slice(0, - 1);
+
+    if (zoom.length > 3) {
+      zoom = zoom.slice(0, -1);
+    }
     zoom = parseFloat(zoom);
 
     return {
